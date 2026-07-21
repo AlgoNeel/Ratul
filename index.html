@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PraniCare BD - Dual-Engine Veterinary Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        prani: {
+                            green: '#16a34a', // Rural theme
+                            green_dark: '#15803d',
+                            green_light: '#dcfce7',
+                            purple: '#8b5cf6', // Urban theme
+                            purple_dark: '#7c3aed',
+                            purple_light: '#ede9fe',
+                            dark: '#1f2937'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+        .loader { border: 3px solid rgba(0,0,0,0.1); border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 h-screen overflow-hidden flex flex-col items-center justify-center">
+
+    <div id="app-container" class="h-full w-full max-w-md bg-white shadow-2xl relative flex flex-col overflow-hidden sm:max-w-xl md:max-w-2xl lg:max-w-5xl lg:flex-row lg:h-[90vh] lg:rounded-2xl lg:border border-gray-200">
+        
+        <!-- Desktop Sidebar (Hidden on mobile devices) -->
+        <div id="desktop-sidebar" class="hidden lg:flex flex-col w-72 text-white transition-all duration-300 z-40 relative">
+            <!-- Desktop Sidebar injected dynamically -->
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col h-full relative w-full overflow-hidden bg-gray-50">
+            <!-- Header -->
+            <header id="app-header" class="w-full text-white p-4 flex justify-between items-center shadow-sm transition-colors duration-300 z-20 shrink-0">
+                <!-- Header content injected dynamically -->
+            </header>
+
+            <!-- Scrollable Content Viewport -->
+            <main id="main-content" class="flex-1 overflow-y-auto pb-20 lg:pb-0 relative scroll-smooth">
+                <!-- Inner sub-views are injected here -->
+            </main>
+
+            <!-- Mobile Bottom Navigation Bar -->
+            <nav id="mobile-nav" class="lg:hidden absolute bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-gray-200 flex justify-around items-center pt-2 pb-safe shadow-[0_-5px_15px_-10px_rgba(0,0,0,0.1)] z-30 transition-transform duration-300">
+                <!-- Mobile Navigation injected dynamically -->
+            </nav>
+        </div>
+        
+        <!-- Business Model Strategy Summary Modal -->
+        <div id="pdf-modal" class="fixed inset-0 bg-gray-900/80 z-50 hidden items-center justify-center backdrop-blur-sm p-4 animate-fade-in">
+            <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl slide-up max-h-[90vh] flex flex-col">
+                <div class="p-5 bg-gray-900 text-white flex justify-between items-center shrink-0">
+                    <h3 class="font-bold text-lg flex items-center"><i class="fas fa-project-diagram mr-2 text-indigo-400"></i> Executive Strategy</h3>
+                    <button onclick="closeModal('pdf-modal')" class="text-gray-400 hover:text-white transition-colors focus:outline-none"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <div class="p-6 overflow-y-auto flex-1 text-sm text-gray-600 space-y-4">
+                    <p class="font-semibold text-gray-800 text-base border-b pb-2">Dual-Engine Business Model Matrix</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                            <h4 class="font-bold text-purple-700 mb-2 flex items-center"><i class="fas fa-paw mr-1.5"></i> Urban Pet Engine</h4>
+                            <ul class="list-disc pl-4 space-y-1 text-xs">
+                                <li>Premium Tele-Vet subscriptions (৳500-1000)</li>
+                                <li>Retail Marketplace commissions (Supplements & Toys)</li>
+                                <li>Smart Health tracking analytics subscriptions</li>
+                                <li><strong class="text-purple-800 font-semibold">Purpose:</strong> Generates critical margins to cross-subsidize low-income rural segments.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                            <h4 class="font-bold text-green-700 mb-2 flex items-center"><i class="fas fa-cow mr-1.5"></i> Rural AgTech Engine</h4>
+                            <ul class="list-disc pl-4 space-y-1 text-xs">
+                                <li>Highly subsidized flat consulting rate (৳50)</li>
+                                <li>Wholesale cattle inputs and B2B bulk purchases</li>
+                                <li>Zero-Data cached guides & local vaccine alerts</li>
+                                <li><strong class="text-green-800 font-semibold">Purpose:</strong> Drives farm scale, ensures livestock survival, collects critical rural dataset.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <h4 class="font-bold text-blue-700 mb-1 flex items-center"><i class="fas fa-network-wired mr-1.5"></i> Shared Infrastructure Tech</h4>
+                        <p class="text-xs text-blue-800 leading-relaxed">Low-bandwidth WebRTC optimizing algorithms for 2G/3G areas, automated phone IVR systems for offline notifications, and complete offline diagnostics to prevent catastrophic crop/livestock losses.</p>
+                    </div>
+                </div>
+                <div class="p-4 border-t bg-gray-50 text-right shrink-0">
+                    <button onclick="closeModal('pdf-modal')" class="bg-gray-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-800 transition-colors focus:outline-none">Understand Platform Architecture</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Billing Modal Overlay -->
+        <div id="payment-modal" class="fixed inset-0 bg-gray-900/80 z-[60] hidden items-center justify-center backdrop-blur-sm p-4">
+            <!-- Form and details are injected through state engines -->
+        </div>
+
+        <!-- WebRTC Video Feed Simulating Overlay -->
+        <div id="video-modal" class="fixed inset-0 bg-black z-[70] hidden flex-col fade-in">
+            <!-- Simulated controls and remote video renderers are injected dynamically -->
+        </div>
+
+        <!-- Central Global Toast System -->
+        <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-gray-900/95 backdrop-blur-md text-white px-5 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 translate-y-[-20px] pointer-events-none z-[100] text-sm font-medium flex items-center min-w-[280px] max-w-[90%] justify-center border border-gray-700">
+            <i id="toast-icon" class="fas fa-info-circle mr-2 text-blue-400 text-lg"></i> 
+            <span id="toast-msg">Default Info Message</span>
+        </div>
+    </div>
+
+    <script>
+        // --- Core Application State Engine ---
+        const state = {
+            mode: null,          // 'urban' | 'rural' | null (Landing selection mode)
+            currentTab: 'home',  // 'home' | 'televet' | 'shop' | 'tracker' | 'offline'
+            offlineTab: 'guides', // Sub-tabs inside Offline Mode: 'guides' | 'calculator' | 'drafts'
+            cartCount: 0,
+            isGeneratingPDF: false,
+            isSyncingDrafts: false,
+            user: { 
+                name: 'Ratul Roy', 
+                phone: '+880 1711-XXXXXX', 
+                balance: 5000 
+            },
+            // Load and pre-populate offline ledger reports from localStorage to make them robust
+            offlineDrafts: JSON.parse(localStorage.getItem('pranicare_drafts')) || [
+                { id: 'draft-101', animal: 'Cattle', identifier: 'Red Bull Tag #09', symptoms: 'Foaming at mouth, high body temperature, limping on back leg.', priority: 'Critical', date: '2026-07-20 18:40' },
+                { id: 'draft-102', animal: 'Dog', identifier: 'Lassie', symptoms: 'Vomited twice after grazing on wild garden weeds.', priority: 'Moderate', date: '2026-07-21 06:12' }
+            ]
+        };
+
+        // --- Multi-Engine Domain Specific Context & Catalogs ---
+        const data = {
+            urban: {
+                themePrimary: 'bg-prani-purple',
+                themeText: 'text-prani-purple',
+                themeHover: 'hover:bg-prani-purple_dark',
+                themeLight: 'bg-purple-50',
+                borderPrimary: 'border-prani-purple',
+                title: 'Urban Pet Care',
+                icon: 'fa-paw',
+                greeting: 'Hello, Pet Parent!',
+                dash: { title: 'Max (Golden Retriever)', alert: 'Rabies Booster - Oct 12', status: 'Healthy & Energetic' },
+                vets: [
+                    { id: 'U1', name: 'Dr. Afia Siddiqua', spec: 'Canine & Feline Clinician', fee: 500, rating: 4.9, status: 'Online', img: 'https://placehold.co/150x150/ede9fe/7c3aed?text=Dr.Afia' },
+                    { id: 'U2', name: 'Dr. Hasan Mahmud', spec: 'Exotic Birds & Pocket Pets Expert', fee: 800, rating: 4.8, status: 'Busy', img: 'https://placehold.co/150x150/ede9fe/7c3aed?text=Dr.Hasan' }
+                ],
+                shop: [
+                    { id: 'P1', name: 'Premium Royal Canin Golden 5kg', price: 4500, img: 'https://placehold.co/200x200/f3f4f6/8b5cf6?text=Dog+Food', tag: 'Premium Feed' },
+                    { id: 'P2', name: 'Anti-Flea Spot-on Solution (Box)', price: 850, img: 'https://placehold.co/200x200/f3f4f6/8b5cf6?text=Flea+Med', tag: 'Clinical Care' },
+                    { id: 'P3', name: 'Omega-3 Skin & Coat Supplement', price: 1200, img: 'https://placehold.co/200x200/f3f4f6/8b5cf6?text=Vitamins', tag: 'Wellness' },
+                    { id: 'P4', name: 'Interactive Smart Laser Toy', price: 650, img: 'https://placehold.co/200x200/f3f4f6/8b5cf6?text=Cat+Toy', tag: 'Enrichment' }
+                ],
+                guides: [
+                    {
+                        icon: 'fas fa-lungs text-purple-600',
+                        title: 'Choking or Breathing Emergency',
+                        steps: [
+                            'Visually check mouth for bones or plastic debris. Do not force objects back.',
+                            'Perform external sub-rib compression thrusts (modified Heimlich maneuver).',
+                            'Minimize noise, heat, and physical stress on the respiratory tract.',
+                            'Keep neck extended to maintain direct airway alignment.'
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-thermometer-high text-red-500',
+                        title: 'Heatstroke / Severe Hyperthermia',
+                        steps: [
+                            'Immediately shift pet to a shaded, cool, or air-circulated room.',
+                            'Drape wet, cool towels around back, lower chest, and footpads.',
+                            'Offer lukewarm water to drink. Never force-feed fluids to an unconscious pet.',
+                            'Avoid submerging in icy water, as it causes dangerous vasoconstriction.'
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-biohazard text-amber-600',
+                        title: 'Poison / Toxic Ingestions',
+                        steps: [
+                            'Identify source (e.g. chocolate, household bleach, rat poison).',
+                            'If instructed by a medical emergency guide, feed Activated Charcoal slurry.',
+                            'Do not force vomiting if toxic substance is corrosive or alkaline.',
+                            'Save a sample of the vomit or suspected toxin packaging for physical verification.'
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-tint text-indigo-500',
+                        title: 'Acute Vomiting & Diarrhea Protocol',
+                        steps: [
+                            'Withhold solid food for 12 hours. Maintain access to clean fresh water.',
+                            'Introduce micro-meals of bland white rice cooked with lean chicken breast.',
+                            'Keep trace of stool frequency, color, and note any dark/tarry signatures.',
+                            'Orally administer electrolyte-hydrating solutions every 2-3 hours.'
+                        ]
+                    }
+                ]
+            },
+            rural: {
+                themePrimary: 'bg-prani-green',
+                themeText: 'text-prani-green',
+                themeHover: 'hover:bg-prani-green_dark',
+                themeLight: 'bg-green-50',
+                borderPrimary: 'border-prani-green',
+                title: 'Rural Livestock Care',
+                icon: 'fa-cow',
+                greeting: 'Assalamu Alaikum, Farmer!',
+                dash: { title: '14 Cattle, 45 Poultry', alert: 'Foot & Mouth Mass Vaccine', status: 'Cattle Pen #2 Healthy' },
+                vets: [
+                    { id: 'R1', name: 'Dr. Shafiqul Islam', spec: 'Ruminant Specialist & Large Animal Surgeon', fee: 50, rating: 4.7, status: 'Online', img: 'https://placehold.co/150x150/dcfce7/16a34a?text=Dr.Shafiq' },
+                    { id: 'R2', name: 'Dr. Rina Begum', spec: 'Avian Pathologist & Poultry Manager', fee: 50, rating: 4.9, status: 'Online', img: 'https://placehold.co/150x150/dcfce7/16a34a?text=Dr.Rina' }
+                ],
+                shop: [
+                    { id: 'F1', name: 'Premium High-Protein Cattle Feed (50kg)', price: 2200, img: 'https://placehold.co/200x200/f3f4f6/16a34a?text=Cattle+Feed', tag: 'Wholesale B2B' },
+                    { id: 'F2', name: 'Poultry Calcium & Liquid Vit-D3 (5L)', price: 1150, img: 'https://placehold.co/200x200/f3f4f6/16a34a?text=Calcium+5L', tag: 'Bulk Feed' },
+                    { id: 'F3', name: 'Broad-Spectrum Dewormer Bolus (Box)', price: 450, img: 'https://placehold.co/200x200/f3f4f6/16a34a?text=Dewormer', tag: 'Pharma Vet' },
+                    { id: 'F4', name: 'Mastitis Rapid Test Plate Kit', price: 300, img: 'https://placehold.co/200x200/f3f4f6/16a34a?text=Mastitis+Kit', tag: 'Diagnostics' }
+                ],
+                guides: [
+                    {
+                        icon: 'fas fa-drumstick-bite text-green-600',
+                        title: 'Bloat / Timpany (Pet Phapa) Emergency',
+                        steps: [
+                            'Prevent the animal from lying down. Keep walking it on soft turf.',
+                            'Administer Antizymotic/Anti-Bloat preparation (Bloat-Nil or Sweet oil) orally.',
+                            'Gently massage left flank area to release trapped rumen fermentation gases.',
+                            'In life-threatening distress, use a trocar and cannula into the left paralumbar fossa.'
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-skull-crossbones text-red-500',
+                        title: 'Sudden High Fever & Lameness (FMD)',
+                        steps: [
+                            'Isolate the sick animal immediately to prevent herd-wide spread.',
+                            'Wash ulcerated hooves and mouth lesions with 1% Potassium Permanganate solution.',
+                            'Offer soft, wet, cooled grass/fodder and avoid hard grain inputs.',
+                            'Keep the stable/pen strictly clean, dry, and free from direct mud.'
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-vial text-amber-600',
+                        title: 'Udder Mastitis Infection Management',
+                        steps: [
+                            'Completely strip the infected quarter of milk frequently (4-6 times daily).',
+                            'Wash teats with antiseptic chlorhexidine solution before and after milking.',
+                            'Check milk on black strip cup to locate flakes, blood clots, or wateriness.',
+                            'Apply cold ice packs to soothe burning, hard swellings on the udder.'
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-temperature-arrow-up text-orange-500',
+                        title: 'PPR Fever & Diarrhea in Goats',
+                        steps: [
+                            'Isolate goats with nasal discharge or sore eyes immediately.',
+                            'Clean encrusted nostrils with clean cotton soaked in warm saline.',
+                            'Keep goats warm, sheltered from drafty winds, and hydrated with oral saline.',
+                            'Prevent access to shared communal water troughs to block viral expansion.'
+                        ]
+                    }
+                ]
+            }
+        };
+
+        const navItems = [
+            { id: 'home', icon: 'fa-home', label: 'Home' },
+            { id: 'televet', icon: 'fa-user-md', label: 'Tele-Vet' },
+            { id: 'shop', icon: 'fa-store', label: 'Market' },
+            { id: 'tracker', icon: 'fa-chart-line', label: 'Tracker' },
+            { id: 'offline', icon: 'fa-wifi', label: 'Offline Mode', slash: true }
+        ];
+
+        // --- Core UI Handle Selectors ---
+        const UI = {
+            main: document.getElementById('main-content'),
+            header: document.getElementById('app-header'),
+            mobNav: document.getElementById('mobile-nav'),
+            deskNav: document.getElementById('desktop-sidebar'),
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toast-msg'),
+            toastIcon: document.getElementById('toast-icon')
+        };
+
+        function initApp() {
+            renderLandingPage();
+        }
+
+        function showToast(message, type = 'info') {
+            UI.toastMsg.textContent = message;
+            
+            UI.toastIcon.className = 'mr-2 text-lg ' + (
+                type === 'success' ? 'fas fa-check-circle text-green-400' : 
+                type === 'error' ? 'fas fa-exclamation-circle text-red-400' : 
+                'fas fa-info-circle text-blue-400'
+            );
+
+            UI.toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+            UI.toast.classList.add('opacity-100', 'translate-y-0');
+            
+            if(window.toastTimer) clearTimeout(window.toastTimer);
+            
+            window.toastTimer = setTimeout(() => {
+                UI.toast.classList.remove('opacity-100', 'translate-y-0');
+                UI.toast.classList.add('opacity-0', 'translate-y-[-20px]');
+            }, 3000);
+        }
+
+        function showModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function closeAllModals() {
+            ['pdf-modal', 'payment-modal', 'video-modal'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+            });
+        }
+
+        function setMode(newMode) {
+            closeAllModals();
+            state.mode = newMode;
+            
+            if (!newMode) {
+                renderLandingPage();
+                return;
+            }
+            
+            state.currentTab = 'home';
+            renderAppShell();
+            renderCurrentTab();
+            
+            showToast(`Loaded ${data[newMode].title} module context.`, 'success');
+        }
+
+        function setTab(tabName) {
+            state.currentTab = tabName;
+            renderAppShell();
+            renderCurrentTab();
+            
+            // Ensure container scrolling resets smoothly to top
+            UI.main.scrollTop = 0;
+        }
+
+        function renderLandingPage() {
+            UI.header.className = "w-full bg-white p-5 flex justify-between items-center shadow-sm z-20 shrink-0 border-b border-gray-100";
+            UI.header.innerHTML = `
+                <div class="flex items-center space-x-3 w-full justify-center text-gray-800">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-extrabold shadow-md">
+                        PC
+                    </div>
+                    <h1 class="text-2xl font-bold tracking-tight">PraniCare BD</h1>
+                </div>
+            `;
+            
+            UI.deskNav.className = "hidden"; 
+            UI.mobNav.classList.add("translate-y-full"); 
+            setTimeout(() => UI.mobNav.classList.add("hidden"), 300); 
+
+            UI.main.className = "flex-1 overflow-y-auto relative bg-gradient-to-b from-gray-50 to-gray-200";
+            UI.main.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-full p-6 text-center fade-in">
+                    <div class="max-w-md w-full">
+                        <h2 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Select Platform Engine</h2>
+                        <p class="text-gray-600 mb-8 font-medium text-sm">Our dual-architecture platform leverages premium urban pet care revenues to cross-subsidize low-cost veterinary support for rural smallholder farmers.</p>
+                        
+                        <div class="space-y-5">
+                            <!-- Urban Pet Care Interface -->
+                            <button onclick="setMode('urban')" class="w-full group relative overflow-hidden rounded-2xl bg-white p-6 shadow-md transition-all hover:shadow-xl hover:-translate-y-1 border border-gray-100 text-left flex items-center space-x-4 focus:outline-none">
+                                <div class="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div class="bg-purple-100 text-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
+                                    <i class="fas fa-paw text-3xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900 mb-1">Urban Pet Care</h3>
+                                    <p class="text-xs text-gray-500 leading-tight">Premium Tele-Vet consults, digital companion metrics, and pet wellness supply hub.</p>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-300 absolute right-6 group-hover:text-purple-500 transition-colors"></i>
+                            </button>
+
+                            <!-- Rural Farm AgTech Interface -->
+                            <button onclick="setMode('rural')" class="w-full group relative overflow-hidden rounded-2xl bg-white p-6 shadow-md transition-all hover:shadow-xl hover:-translate-y-1 border border-gray-100 text-left flex items-center space-x-4 focus:outline-none">
+                                <div class="absolute inset-0 bg-gradient-to-r from-green-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div class="bg-green-100 text-green-600 w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
+                                    <i class="fas fa-cow text-3xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900 mb-1">Rural Farm AgTech</h3>
+                                    <p class="text-xs text-gray-500 leading-tight">৳50 flat-rate consultations, wholesale feed supplies, and zero-data offline ledger books.</p>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-300 absolute right-6 group-hover:text-green-500 transition-colors"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="mt-12">
+                            <button onclick="showModal('pdf-modal')" class="text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors flex items-center justify-center w-full focus:outline-none">
+                                <i class="fas fa-project-diagram mr-2 text-indigo-500 animate-pulse"></i> Deep-Dive: Sustainable Business Matrix
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAppShell() {
+            const cfg = data[state.mode];
+            
+            // Apply theme configuration to Header
+            UI.header.className = `w-full text-white p-4 flex justify-between items-center shadow-md z-20 shrink-0 transition-colors duration-500 ${cfg.themePrimary}`;
+            UI.header.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <button onclick="setMode(null)" class="w-10 h-10 flex items-center justify-center hover:bg-black/10 rounded-full transition-colors focus:outline-none" aria-label="Go Back">
+                        <i class="fas fa-arrow-left text-lg"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas ${cfg.icon} text-xl"></i>
+                        <h1 class="text-lg font-bold tracking-tight hidden sm:block">${cfg.title}</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showToast('No critical alerts pending at this time.', 'info')" class="relative hover:scale-105 transition-transform focus:outline-none">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-amber-500 border-2 border-white text-white text-[9px] font-bold rounded-full h-4.5 w-4.5 flex items-center justify-center">1</span>
+                    </button>
+                    <button onclick="showToast('Logged in as Ratul Roy (${state.user.phone})', 'info')" class="w-9 h-9 bg-white text-gray-800 rounded-full flex items-center justify-center font-bold shadow-sm hover:scale-105 transition-all focus:outline-none">
+                        ${state.user.name.charAt(0)}
+                    </button>
+                </div>
+            `;
+
+            // Style Mobile Navigation Bar
+            UI.mobNav.classList.remove("hidden", "translate-y-full");
+            UI.mobNav.innerHTML = navItems.map(item => `
+                <button onclick="setTab('${item.id}')" class="flex flex-col items-center justify-center w-full py-2 px-1 transition-all focus:outline-none ${state.currentTab === item.id ? cfg.themeText + ' font-bold scale-105' : 'text-gray-400 hover:text-gray-600'}">
+                    <div class="relative mb-1">
+                        <i class="fas ${item.icon} text-lg"></i>
+                        ${item.slash ? '<div class="absolute inset-0 flex items-center justify-center"><div class="w-[120%] h-0.5 bg-current transform -rotate-45"></div></div>' : ''}
+                    </div>
+                    <span class="text-[10px] font-semibold tracking-wide">${item.label}</span>
+                </button>
+            `).join('');
+
+            // Style Desktop Sidebar Navigation
+            UI.deskNav.className = `hidden lg:flex flex-col w-72 text-white shadow-xl transition-colors duration-500 z-40 ${cfg.themePrimary}`;
+            UI.deskNav.innerHTML = `
+                <div class="p-6 border-b border-white/20 shrink-0">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="bg-white text-${cfg.themePrimary.replace('bg-', '')} p-2.5 rounded-xl shadow-md">
+                            <i class="fas ${cfg.icon} text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-extrabold leading-tight">PraniCare BD</h2>
+                            <p class="text-xs font-semibold opacity-80 uppercase tracking-widest mt-0.5">${state.mode} Platform</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="flex-1 py-6 space-y-1.5 overflow-y-auto px-4">
+                    ${navItems.map(item => `
+                        <button onclick="setTab('${item.id}')" class="w-full flex items-center px-4 py-3 rounded-xl transition-all focus:outline-none ${state.currentTab === item.id ? 'bg-white text-' + cfg.themePrimary.replace('bg-', '') + ' shadow-md font-bold' : 'text-white/80 hover:bg-white/10 hover:text-white font-semibold'}">
+                            <div class="relative w-8 text-center mr-2">
+                                <i class="fas ${item.icon} text-lg"></i>
+                                ${item.slash ? '<div class="absolute inset-0 flex items-center justify-center"><div class="w-full h-0.5 bg-current transform -rotate-45"></div></div>' : ''}
+                            </div>
+                            <span class="text-sm">${item.label}</span>
+                            ${state.currentTab === item.id ? '<i class="fas fa-chevron-right ml-auto text-xs opacity-50"></i>' : ''}
+                        </button>
+                    `).join('')}
+                </nav>
+                <div class="p-6 border-t border-white/20 shrink-0">
+                    <button onclick="setMode(null)" class="w-full flex items-center justify-center px-4 py-3 bg-black/20 hover:bg-black/30 rounded-xl transition-colors text-sm font-bold focus:outline-none">
+                        <i class="fas fa-sync-alt mr-2"></i> Toggle System Engine
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderCurrentTab() {
+            UI.main.innerHTML = '';
+            UI.main.className = "flex-1 overflow-y-auto pb-24 lg:pb-0 relative scroll-smooth bg-gray-50"; 
+            
+            switch (state.currentTab) {
+                case 'home': UI.main.innerHTML = getHomeHTML(); break;
+                case 'televet': UI.main.innerHTML = getTeleVetHTML(); break;
+                case 'shop': UI.main.innerHTML = getShopHTML(); break;
+                case 'tracker': UI.main.innerHTML = getTrackerHTML(); break;
+                case 'offline': UI.main.innerHTML = getOfflineHTML(); break;
+            }
+        }
+
+        function getHomeHTML() {
+            const cfg = data[state.mode];
+            const dash = cfg.dash;
+            const isRural = state.mode === 'rural';
+            
+            return `
+                <div class="p-4 sm:p-6 lg:p-8 fade-in space-y-6 max-w-4xl mx-auto">
+                    <!-- Dynamic Overview Card -->
+                    <div class="${cfg.themePrimary} rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
+                        <div class="absolute -top-24 -right-24 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+                        
+                        <div class="relative z-10">
+                            <h2 class="text-2xl font-bold mb-1">${cfg.greeting}</h2>
+                            <p class="opacity-90 text-sm font-medium">Your customized environment is active.</p>
+                            
+                            <div class="mt-6 bg-white/10 rounded-xl p-4 backdrop-blur-md border border-white/20 shadow-inner">
+                                <h3 class="font-bold text-sm flex items-center mb-3 tracking-wide uppercase"><i class="fas fa-clipboard-list mr-2"></i> Current Herd/Pet Overview</h3>
+                                <div class="space-y-2.5">
+                                    <div class="flex justify-between items-center border-b border-white/20 pb-2">
+                                        <span class="opacity-80 text-xs">Profile Focus</span>
+                                        <span class="font-bold text-xs bg-white/20 px-2.5 py-0.5 rounded">${dash.title}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-b border-white/20 pb-2">
+                                        <span class="opacity-80 text-xs">Active Program</span>
+                                        <span class="font-bold text-xs flex items-center text-yellow-300"><i class="fas fa-exclamation-triangle mr-1.5 text-xs"></i> ${dash.alert}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="opacity-80 text-xs">Health Standing</span>
+                                        <span class="font-bold text-xs flex items-center"><i class="fas fa-check-circle mr-1 text-green-300"></i> ${dash.status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Primary Operational Shortcuts -->
+                    <h3 class="font-bold text-gray-800 text-base mb-2 flex items-center tracking-tight">
+                        <i class="fas fa-bolt text-yellow-500 mr-2"></i> Quick Operations
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="setTab('televet')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center hover:shadow-md hover:border-${cfg.themePrimary.replace('bg-', '')} transition-all active:scale-95 group focus:outline-none">
+                            <div class="${cfg.themeText} ${cfg.themeLight} w-14 h-14 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-video text-2xl"></i>
+                            </div>
+                            <span class="font-bold text-gray-800 text-xs sm:text-sm">Instant Tele-Vet</span>
+                            <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mt-1">${isRural ? '৳50 Flat Rate' : 'Premium Video Hub'}</span>
+                        </button>
+                        
+                        <button onclick="setTab('offline')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center hover:shadow-md hover:border-red-500 transition-all active:scale-95 relative overflow-hidden group focus:outline-none">
+                            <div class="absolute top-0 right-0 bg-red-500 text-white text-[8px] px-2 py-0.5 rounded-bl-lg font-bold tracking-widest shadow-sm">LOCAL CACHE</div>
+                            <div class="text-red-500 bg-red-50 w-14 h-14 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-briefcase-medical text-2xl"></i>
+                            </div>
+                            <span class="font-bold text-gray-800 text-xs sm:text-sm">First-Aid Ledger</span>
+                            <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mt-1">100% Zero-Data</span>
+                        </button>
+                    </div>
+
+                    <!-- Local Supply Market Grid -->
+                    <div class="flex justify-between items-baseline mt-4 mb-2">
+                        <h3 class="font-bold text-gray-800 text-base flex items-center tracking-tight">
+                            <i class="fas fa-store-alt text-gray-400 mr-2"></i> Featured Clinical Supplies
+                        </h3>
+                        <button onclick="setTab('shop')" class="${cfg.themeText} text-xs font-bold hover:underline focus:outline-none">Explore Store</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${cfg.shop.slice(0, 2).map(item => `
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group">
+                                <div class="h-32 bg-gray-50 p-4 flex items-center justify-center relative overflow-hidden">
+                                    <img src="${item.img}" alt="${item.name}" class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500">
+                                </div>
+                                <div class="p-3.5 border-t border-gray-50">
+                                    <span class="text-[9px] font-extrabold text-gray-400 uppercase tracking-widest">${item.tag}</span>
+                                    <h4 class="font-bold text-xs text-gray-800 leading-snug mt-1 truncate" title="${item.name}">${item.name}</h4>
+                                    <div class="mt-3 flex justify-between items-center">
+                                        <span class="font-extrabold text-sm ${cfg.themeText}">৳${item.price}</span>
+                                        <button onclick="addToCart('${item.id}', this)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition-colors focus:outline-none">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getTeleVetHTML() {
+            const cfg = data[state.mode];
+            const isRural = state.mode === 'rural';
+            
+            const crossSubsidizedAdvantage = isRural ? `
+                <div class="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 p-4 rounded-xl mb-6 shadow-sm flex items-start">
+                    <div class="bg-white p-2 rounded-full shadow-sm mr-3 text-green-600 shrink-0"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div>
+                        <h4 class="font-bold text-green-800 text-sm">Cross-Subsidized Pricing Active</h4>
+                        <p class="text-xs text-green-700 mt-1">This <b>৳50 Flat Rate</b> is subsidised entirely by urban pet consultations. Fully optimized for 2G/3G WebRTC bandwidths.</p>
+                    </div>
+                </div>` : `
+                <div class="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 p-4 rounded-xl mb-6 shadow-sm flex items-start">
+                    <div class="bg-white p-2 rounded-full shadow-sm mr-3 text-purple-600 shrink-0"><i class="fas fa-handshake"></i></div>
+                    <div>
+                        <h4 class="font-bold text-purple-800 text-sm">PraniCare Generosity Protocol</h4>
+                        <p class="text-xs text-purple-700 mt-1">A portion of your <b>৳500+</b> consultation fee directly funds essential livestock health interventions in marginalized rural farming sectors.</p>
+                    </div>
+                </div>`;
+            
+            return `
+                <div class="p-4 sm:p-6 lg:p-8 fade-in max-w-4xl mx-auto flex flex-col">
+                    <div class="text-center mb-6">
+                        <div class="inline-block p-4 rounded-full ${cfg.themeLight} ${cfg.themeText} mb-3 shadow-inner">
+                            <i class="fas fa-user-md text-3xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">Virtual Clinic Board</h2>
+                        <p class="text-gray-500 text-xs mt-1 font-medium">BVC-Registered Specialists active for live audio/video streaming.</p>
+                    </div>
+                    
+                    ${crossSubsidizedAdvantage}
+
+                    <div class="space-y-4">
+                        ${cfg.vets.map(vet => `
+                            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 hover:shadow-md transition-shadow">
+                                <div class="relative shrink-0">
+                                    <img src="${vet.img}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-gray-100 shadow-sm" alt="${vet.name}">
+                                    <div class="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white ${vet.status === 'Online' ? 'bg-green-500' : 'bg-amber-500'} shadow-sm"></div>
+                                </div>
+                                <div class="flex-1 text-center sm:text-left w-full">
+                                    <h3 class="font-bold text-base sm:text-lg text-gray-900 flex items-center justify-center sm:justify-start">
+                                        ${vet.name} <i class="fas fa-check-circle text-blue-500 text-xs sm:text-sm ml-2" title="Verified Professional"></i>
+                                    </h3>
+                                    <p class="text-xs text-gray-500 font-medium">${vet.spec}</p>
+                                    <div class="flex items-center justify-center sm:justify-start space-x-2 mt-2 text-[10px] text-gray-500 font-semibold bg-gray-100 inline-flex px-2.5 py-1 rounded-full">
+                                        <span class="flex items-center"><i class="fas fa-star text-yellow-400 mr-1"></i> ${vet.rating}</span>
+                                        <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                                        <span>BVC: 2026-N${Math.floor(Math.random()*8000)+1000}</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center sm:items-end justify-center w-full sm:w-auto shrink-0 border-t sm:border-t-0 sm:border-l border-gray-100 pt-4 sm:pt-0 sm:pl-5">
+                                    <span class="text-2xl font-extrabold ${cfg.themeText} mb-2">৳${vet.fee}<span class="text-xs text-gray-400 font-normal"> / call</span></span>
+                                    <button onclick="promptPayment(${vet.fee}, '${vet.name}')" class="w-full sm:w-auto ${cfg.themePrimary} text-white px-5 py-2.5 rounded-xl font-bold hover:shadow-lg ${cfg.themeHover} transition-all focus:outline-none flex items-center justify-center text-sm">
+                                        <i class="fas fa-video mr-2"></i> Initialise WebRTC
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getShopHTML() {
+            const cfg = data[state.mode];
+            const isRural = state.mode === 'rural';
+            
+            return `
+                <div class="p-4 sm:p-6 lg:p-8 fade-in max-w-5xl mx-auto flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">${isRural ? 'B2B Farm Input Supplies' : 'Retail Pet Wellness Store'}</h2>
+                            <p class="text-gray-500 text-xs mt-1 font-medium">Quality checks and direct enterprise logistics</p>
+                        </div>
+                        <button onclick="showToast('Your Cart contains ${state.cartCount} item(s). Checkout flow simulated in prototype.', 'info')" class="relative bg-white p-3 rounded-xl shadow-sm text-gray-600 hover:${cfg.themeText} transition-colors border border-gray-100 focus:outline-none">
+                            <i class="fas fa-shopping-cart text-lg"></i>
+                            <span id="cart-badge" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-sm ${state.cartCount > 0 ? '' : 'hidden'}">${state.cartCount}</span>
+                        </button>
+                    </div>
+
+                    <!-- Search Catalog Input -->
+                    <div class="flex space-x-3 mb-6">
+                        <div class="relative flex-1">
+                            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                            <input type="text" placeholder="Search verified local suppliers..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-${cfg.themePrimary.replace('bg-', '')} focus:border-transparent shadow-sm bg-white text-xs sm:text-sm font-medium">
+                        </div>
+                        <button onclick="showToast('Filtering parameters set dynamically.', 'success')" class="bg-white px-4 rounded-xl border border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50 active:scale-95 transition-all focus:outline-none">
+                            <i class="fas fa-sliders-h"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        ${cfg.shop.map(item => `
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
+                                <div class="h-36 sm:h-44 bg-gray-50 p-4 flex items-center justify-center relative overflow-hidden">
+                                    <img src="${item.img}" alt="${item.name}" class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500 mix-blend-multiply">
+                                </div>
+                                <div class="p-3 sm:p-4 flex flex-col flex-1 border-t border-gray-50">
+                                    <span class="text-[9px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">${item.tag}</span>
+                                    <h4 class="font-bold text-xs sm:text-sm text-gray-900 leading-snug flex-1">${item.name}</h4>
+                                    <div class="mt-4 flex justify-between items-center">
+                                        <span class="font-extrabold text-base ${cfg.themeText}">৳${item.price}</span>
+                                        <button onclick="addToCart('${item.id}', this)" class="${cfg.themePrimary} text-white w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center hover:opacity-90 transition-all shadow-sm focus:outline-none active:scale-90 transform">
+                                            <i class="fas fa-cart-plus text-xs sm:text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getTrackerHTML() {
+            const cfg = data[state.mode];
+            const isRural = state.mode === 'rural';
+            
+            return `
+                <div class="p-4 sm:p-6 lg:p-8 fade-in max-w-4xl mx-auto">
+                    <div class="mb-6 flex justify-between items-end">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 flex items-center"><i class="fas fa-chart-line mr-2 text-gray-400"></i> Local Health Timeline</h2>
+                            <p class="text-gray-500 text-xs mt-1 font-medium">${isRural ? 'Livestock vaccination and artificial insemination schedules' : 'Vaccination records & monthly physical milestones'}</p>
+                        </div>
+                        <button onclick="showToast('Feature restricted to active subscriptions.', 'error')" class="bg-white text-${cfg.themePrimary.replace('bg-', '')} p-2 px-3 sm:px-4 rounded-xl text-xs font-bold border border-gray-200 shadow-sm flex items-center hover:bg-gray-50 active:scale-95 transition-all focus:outline-none">
+                            <i class="fas fa-plus mr-1.5 text-xs"></i> New Milestone
+                        </button>
+                    </div>
+
+                    <!-- Voice Calling integration helper -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-4 sm:p-5 mb-6 flex justify-between items-center shadow-sm">
+                        <div class="flex items-center space-x-3.5">
+                            <div class="bg-white text-blue-500 w-11 h-11 rounded-xl flex items-center justify-center shadow-sm shrink-0">
+                                <i class="fas fa-robot text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-blue-950 text-xs sm:text-sm">IVR Automated Voice Reminders</h4>
+                                <p class="text-[10px] text-blue-700 mt-0.5">Automated robotic calls in local dialects for low-literacy farmers.</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" class="sr-only peer" checked onchange="showToast('Voice notification profiles updated.', 'success')">
+                            <div class="w-10 h-5.5 bg-blue-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-blue-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- Timeline structure -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+                        <h3 class="font-bold text-gray-800 mb-5 text-xs uppercase tracking-wider">Scheduled Programs</h3>
+                        
+                        <div class="relative border-l-2 border-gray-100 ml-3 space-y-6" id="tracker-timeline">
+                            <div class="relative pl-6">
+                                <div class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-red-500 ring-4 ring-white shadow-sm"></div>
+                                <div class="bg-red-50/50 p-4 rounded-xl border border-red-100">
+                                    <span class="text-[9px] font-extrabold text-red-600 bg-red-100 px-2 py-0.5 rounded-md mb-2 inline-block tracking-widest uppercase">Emergency Call Program</span>
+                                    <h4 class="font-bold text-sm text-gray-900">${isRural ? 'Cattle FMD Vaccine (A-Herd)' : 'Rabies Immunisation Dose'}</h4>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">${isRural ? 'Group A has immediate scheduled program tomorrow.' : 'Max is eligible for Booster inoculation.'}</p>
+                                    <p class="text-[10px] text-red-500 mt-3 font-bold flex items-center"><i class="fas fa-clock mr-1"></i> Critical: Scheduled tomorrow</p>
+                                </div>
+                            </div>
+
+                            <div class="relative pl-6">
+                                <div class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-gray-300 ring-4 ring-white shadow-sm"></div>
+                                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                    <h4 class="font-bold text-sm text-gray-900">${isRural ? 'Cattle Pregnancy Validation Tag #102' : 'Anti-Parasitic Dewormer Bolus'}</h4>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">${isRural ? 'Vet physical exam after insemination log.' : 'Oral administration of antiparasitics required.'}</p>
+                                    <p class="text-[10px] text-gray-500 mt-3 font-bold flex items-center"><i class="fas fa-calendar-alt mr-1"></i> Due in 12 days</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getOfflineHTML() {
+            const cfg = data[state.mode];
+            const isRural = state.mode === 'rural';
+            
+            // Render sub-navigation bar specifically to divide Guides, Interactive Calculator and Draft records
+            const subTabsHeader = `
+                <div class="flex border-b border-gray-200 mb-6 bg-white p-1 rounded-xl shadow-inner shrink-0 text-xs sm:text-sm">
+                    <button onclick="setOfflineSubTab('guides')" class="flex-1 py-2.5 rounded-lg text-center font-bold transition-all focus:outline-none ${state.offlineTab === 'guides' ? (state.mode === 'rural' ? 'bg-prani-green text-white shadow-sm' : 'bg-prani-purple text-white shadow-sm') : 'text-gray-500 hover:text-gray-800'}">
+                        <i class="fas fa-book-medical mr-1.5"></i> First Aid Guides
+                    </button>
+                    <button onclick="setOfflineSubTab('calculator')" class="flex-1 py-2.5 rounded-lg text-center font-bold transition-all focus:outline-none ${state.offlineTab === 'calculator' ? (state.mode === 'rural' ? 'bg-prani-green text-white shadow-sm' : 'bg-prani-purple text-white shadow-sm') : 'text-gray-500 hover:text-gray-800'}">
+                        <i class="fas fa-calculator mr-1.5"></i> Dosage Calc
+                    </button>
+                    <button onclick="setOfflineSubTab('drafts')" class="flex-1 py-2.5 rounded-lg text-center font-bold transition-all focus:outline-none ${state.offlineTab === 'drafts' ? (state.mode === 'rural' ? 'bg-prani-green text-white shadow-sm' : 'bg-prani-purple text-white shadow-sm') : 'text-gray-500 hover:text-gray-800'}">
+                        <i class="fas fa-file-signature mr-1.5"></i> Draft Ledger
+                        ${state.offlineDrafts.length > 0 ? `<span class="ml-1 bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">${state.offlineDrafts.length}</span>` : ''}
+                    </button>
+                </div>
+            `;
+
+            let subContentHTML = '';
+            
+            if (state.offlineTab === 'guides') {
+                // Renders diagnostic trees
+                subContentHTML = `
+                    <div class="space-y-4">
+                        <div class="bg-amber-50 border border-amber-200 text-amber-900 p-3.5 rounded-xl flex items-start text-xs sm:text-sm">
+                            <i class="fas fa-wifi text-amber-600 mr-2.5 mt-0.5 text-base"></i>
+                            <div>
+                                <span class="font-bold">Zero-Data Offline Access Active:</span> The diagnosis procedures below are cached in local browser storage (1.4MB) and operate entirely without cell reception.
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            ${cfg.guides.map(guide => generateAccordionItem(guide.icon, guide.title, guide.steps)).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (state.offlineTab === 'calculator') {
+                // Renders the interactive Dosage calculator
+                subContentHTML = `
+                    <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm space-y-4">
+                        <h4 class="font-bold text-gray-900 text-sm flex items-center"><i class="fas fa-info-circle text-blue-500 mr-2"></i> Clinical Emergency Dosage Calculator</h4>
+                        <p class="text-gray-500 text-xs">Enter target animal weight to compute safe off-grid support fluid doses.</p>
+                        
+                        <div class="space-y-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Select Target Category</label>
+                                <select id="dosage-animal-type" onchange="updateDosageForm()" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs sm:text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                    ${isRural ? `
+                                        <option value="cattle" selected>Cattle (Ox/Cow)</option>
+                                        <option value="goat">Goat / Sheep</option>
+                                    ` : `
+                                        <option value="dog" selected>Dog (Canine)</option>
+                                        <option value="cat">Cat (Feline)</option>
+                                    `}
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Animal Bodyweight (kg)</label>
+                                <input type="number" id="dosage-weight" value="15" oninput="calculateEmergencyDose()" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs sm:text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300" placeholder="Enter approximate weight in kilograms">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Required Medicine Formula</label>
+                                <select id="dosage-medicine" onchange="calculateEmergencyDose()" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs sm:text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                    <option value="ors">Hydration Reconstitution Fluids (ORS)</option>
+                                    <option value="charcoal">Activated Charcoal Suspension (Poisoning)</option>
+                                    <option value="antihistamine">Emergency Antihistamine Liquid</option>
+                                    ${isRural ? `<option value="bloat">Emergency Carminative Bloat Guard Solution</option>` : ''}
+                                </select>
+                            </div>
+
+                            <!-- Interactive Calculation Results Panel -->
+                            <div class="bg-gray-50 border border-gray-100 p-4 rounded-xl flex items-start space-x-3 mt-4">
+                                <div class="bg-white border border-gray-100 text-gray-700 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm shrink-0" id="dosage-metric-box">
+                                    -
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Computed Dosage Metric</h5>
+                                    <p class="text-sm font-extrabold text-gray-800 mt-0.5" id="dosage-value-display">Please specify criteria...</p>
+                                    <p class="text-[10px] text-gray-400 font-medium leading-relaxed mt-1" id="dosage-instructions-display">Administration criteria dynamic recommendations.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                // Trigger an initial automatic assessment run
+                setTimeout(() => { updateDosageForm(); }, 100);
+            } else if (state.offlineTab === 'drafts') {
+                // Renders the local storage-linked Offline Drafts list and creation forms
+                const draftsCount = state.offlineDrafts.length;
+                
+                subContentHTML = `
+                    <div class="space-y-6">
+                        <!-- Cloud Sync Actions Bar -->
+                        <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div>
+                                <h4 class="font-bold text-sm text-gray-900">Offline Report Records Ledger</h4>
+                                <p class="text-gray-400 text-xs mt-0.5">Logs are saved locally and synced once internet resumes.</p>
+                            </div>
+                            ${draftsCount > 0 ? `
+                                <button onclick="triggerCloudSync()" class="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md hover:bg-blue-700 transition-colors focus:outline-none flex items-center justify-center shrink-0">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ${draftsCount} Drafts
+                                </button>
+                            ` : `
+                                <span class="bg-gray-100 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-200">System Fully Synced</span>
+                            `}
+                        </div>
+
+                        <!-- Sync Progress Loader overlay representation -->
+                        <div id="sync-loader" class="hidden bg-blue-50 border border-blue-200 p-4 rounded-2xl text-blue-800 text-center animate-pulse">
+                            <div class="flex items-center justify-center space-x-2 text-xs font-bold">
+                                <div class="loader w-4 h-4 border-2"></div>
+                                <span>Verifying digital Handshakes with PraniCare BD Servers...</span>
+                            </div>
+                            <div class="w-full bg-blue-200 h-1.5 rounded-full overflow-hidden mt-2.5">
+                                <div id="sync-loader-bar" class="bg-blue-600 h-full w-0 transition-all duration-300"></div>
+                            </div>
+                        </div>
+
+                        <!-- New Draft record intake form -->
+                        <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                            <h4 class="font-bold text-gray-900 text-sm mb-4 flex items-center"><i class="fas fa-file-medical text-green-600 mr-2"></i> Record New Symptom Offline</h4>
+                            <form id="offline-draft-form" onsubmit="saveOfflineDraft(event)" class="space-y-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1">Target Category</label>
+                                        <select id="draft-animal" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs font-semibold text-gray-800 focus:outline-none">
+                                            <option value="Cattle">Cattle</option>
+                                            <option value="Goat">Goat / Sheep</option>
+                                            <option value="Poultry">Poultry</option>
+                                            <option value="Dog">Dog</option>
+                                            <option value="Cat">Cat</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1">Identifier / Tag No</label>
+                                        <input type="text" id="draft-identifier" placeholder="e.g. Red Tag #05" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs font-semibold text-gray-800 focus:outline-none" required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1">Severity Assessment</label>
+                                    <select id="draft-priority" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs font-semibold text-gray-800 focus:outline-none">
+                                        <option value="Mild">Mild / Preventive check</option>
+                                        <option value="Moderate" selected>Moderate / High Temperature</option>
+                                        <option value="Critical">Critical / Life-threatening</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1">Observed Clinical Symptoms</label>
+                                    <textarea id="draft-symptoms" placeholder="Describe clinical symptoms (e.g., loss of appetite, bloating, high body temperature...)" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-xs font-semibold text-gray-800 focus:outline-none h-20" required></textarea>
+                                </div>
+                                <button type="submit" class="w-full py-3 ${cfg.themePrimary} ${cfg.themeHover} text-white text-xs font-bold rounded-xl shadow-md transition-colors focus:outline-none">
+                                    <i class="fas fa-save mr-1.5"></i> Save Report in Local Ledger
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Draft Records List rendering -->
+                        <div class="space-y-3">
+                            <h4 class="font-bold text-gray-800 text-xs uppercase tracking-wider flex items-center"><i class="fas fa-list-ul mr-2 text-gray-400"></i> Records list inside local ledger (${draftsCount})</h4>
+                            
+                            ${draftsCount === 0 ? `
+                                <div class="bg-gray-100 border border-dashed border-gray-300 rounded-2xl p-6 text-center text-gray-400 text-xs">
+                                    No pending reports inside the offline ledger. Use the form above to record logs.
+                                </div>
+                            ` : state.offlineDrafts.map(draft => {
+                                const priorityColors = 
+                                    draft.priority === 'Critical' ? 'bg-red-100 text-red-700 border-red-200' :
+                                    draft.priority === 'Moderate' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                    'bg-green-100 text-green-700 border-green-200';
+                                
+                                return `
+                                    <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+                                        <div class="flex justify-between items-start mb-2.5">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="bg-gray-100 text-gray-800 text-[9px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">${draft.animal}</span>
+                                                    <span class="font-bold text-xs text-gray-900">${draft.identifier}</span>
+                                                </div>
+                                                <span class="text-[9px] text-gray-400 block mt-1">${draft.date}</span>
+                                            </div>
+                                            <span class="text-[8px] font-extrabold px-2.5 py-0.5 rounded-full border ${priorityColors} uppercase tracking-wider">${draft.priority}</span>
+                                        </div>
+                                        <p class="text-xs text-gray-600 leading-relaxed bg-gray-50 p-2.5 rounded-lg border border-gray-100 font-medium">${draft.symptoms}</p>
+                                        
+                                        <!-- Actions inside Local Draft Ledger card -->
+                                        <div class="flex justify-between items-center mt-3.5 pt-3.5 border-t border-gray-50 text-[11px] font-bold">
+                                            <button onclick="copyDraftToClipboard('${draft.id}')" class="text-gray-500 hover:text-gray-800 transition-colors flex items-center">
+                                                <i class="fas fa-copy mr-1.5"></i> Copy Log
+                                            </button>
+                                            <button onclick="deleteOfflineDraft('${draft.id}')" class="text-red-500 hover:text-red-700 transition-colors flex items-center">
+                                                <i class="fas fa-trash-alt mr-1.5"></i> Purge Record
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Notice: We use min-h-full to prevent scrolling cuts & pb-24 for safe spacing above navigation controls
+            return `
+                <div class="p-4 sm:p-6 lg:p-8 fade-in min-h-full bg-gray-50 max-w-4xl mx-auto flex flex-col pb-24">
+                    <!-- General Offline Banner -->
+                    <div class="bg-gray-950 rounded-2xl p-6 text-white shadow-xl text-center mb-6 relative overflow-hidden shrink-0">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-600 rounded-full blur-3xl opacity-15"></div>
+                        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-600 rounded-full blur-3xl opacity-15"></div>
+                        
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="bg-red-500/10 text-red-400 w-14 h-14 rounded-full flex items-center justify-center mb-3 border border-red-500/20">
+                                <div class="relative">
+                                    <i class="fas fa-wifi text-xl"></i>
+                                    <div class="absolute inset-0 flex items-center justify-center"><div class="w-7 h-0.5 bg-red-400 transform -rotate-45"></div></div>
+                                </div>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">Zero-Data Offline Ledger Book</h2>
+                            <p class="opacity-80 text-xs max-w-sm mt-1 leading-relaxed">Save reports, diagnostics, calculate drug doses and track medical history completely off-grid.</p>
+                        </div>
+                    </div>
+
+                    ${subTabsHeader}
+
+                    <div class="flex-1">
+                        ${subContentHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateAccordionItem(iconClass, title, steps) {
+            return `
+                <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <button onclick="toggleAccordion(this)" class="w-full px-5 py-4 text-left font-bold text-gray-900 flex justify-between items-center bg-white hover:bg-gray-50/50 transition-colors focus:outline-none">
+                        <span class="flex items-center text-xs sm:text-sm"><div class="w-8 flex justify-center mr-2"><i class="${iconClass} text-base sm:text-lg"></i></div> ${title}</span>
+                        <div class="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center shrink-0">
+                            <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform duration-300"></i>
+                        </div>
+                    </button>
+                    <div class="px-5 py-5 border-t border-gray-50 hidden bg-gray-50/40">
+                        <p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400 mb-3.5">Urgent Off-Grid Protocol Actions:</p>
+                        <ul class="space-y-3.5">
+                            ${steps.map((step, i) => `
+                                <li class="flex items-start">
+                                    <span class="bg-gray-200 text-gray-600 text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 mr-3 mt-0.5">${i+1}</span>
+                                    <span class="text-xs text-gray-700 font-semibold leading-relaxed">${step}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleAccordion(btn) {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('.fa-chevron-down');
+            
+            document.querySelectorAll('.border-t.block').forEach(c => {
+                if (c !== content) {
+                    c.classList.remove('block');
+                    c.classList.add('hidden');
+                    c.previousElementSibling.querySelector('.fa-chevron-down').classList.remove('rotate-180');
+                }
+            });
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                content.classList.add('block');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.remove('block');
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function setOfflineSubTab(tab) {
+            state.offlineTab = tab;
+            renderCurrentTab();
+        }
+
+        function updateDosageForm() {
+            const medSelect = document.getElementById('dosage-medicine');
+            const animal = document.getElementById('dosage-animal-type').value;
+            
+            // Adjust options list depending on animal selection to present appropriate protocols
+            if (animal === 'cattle' || animal === 'goat') {
+                if (!Array.from(medSelect.options).some(o => o.value === 'bloat')) {
+                    const option = document.createElement('option');
+                    option.value = 'bloat';
+                    option.text = 'Emergency Carminative Bloat Guard Solution';
+                    medSelect.add(option);
+                }
+            } else {
+                for (let i = medSelect.options.length - 1; i >= 0; i--) {
+                    if (medSelect.options[i].value === 'bloat') {
+                        medSelect.remove(i);
+                    }
+                }
+            }
+            calculateEmergencyDose();
+        }
+
+        function calculateEmergencyDose() {
+            const animal = document.getElementById('dosage-animal-type').value;
+            const weightInput = document.getElementById('dosage-weight').value;
+            const med = document.getElementById('dosage-medicine').value;
+            const metricBox = document.getElementById('dosage-metric-box');
+            const valDisplay = document.getElementById('dosage-value-display');
+            const instrDisplay = document.getElementById('dosage-instructions-display');
+
+            const w = parseFloat(weightInput);
+            if (!w || w <= 0) {
+                metricBox.textContent = '-';
+                valDisplay.textContent = 'Please specify dynamic criteria...';
+                instrDisplay.textContent = 'Enter accurate weight values in kg to render calculations.';
+                return;
+            }
+
+            let resultVal = '';
+            let unit = '';
+            let instructions = '';
+
+            if (med === 'ors') {
+                const calculatedMl = w * 50; 
+                resultVal = calculatedMl >= 1000 ? (calculatedMl/1000).toFixed(1) : calculatedMl.toFixed(0);
+                unit = calculatedMl >= 1000 ? ' Litres' : ' ml';
+                instructions = `Administer small quantities orally every 30-45 minutes to recover hydration metrics.`;
+            } else if (med === 'charcoal') {
+                const grams = w * 2.5; 
+                resultVal = grams.toFixed(1);
+                unit = ' grams';
+                instructions = `Reconstitute in safe, fresh drinking water as a paste slurry. Feed cautiously to prevent inhalation.`;
+            } else if (med === 'antihistamine') {
+                const dosageMg = w * 1.2; 
+                resultVal = dosageMg.toFixed(1);
+                unit = ' mg';
+                instructions = `Indicated to halt critical tissue swelling and anaphylaxis. Feed once in a 12 hour cycle.`;
+            } else if (med === 'bloat') {
+                const ml = w * 1.5; 
+                resultVal = ml.toFixed(0);
+                unit = ' ml';
+                instructions = `Highly effective against stomach fermentations. Do not let animals lie down.`;
+            }
+
+            metricBox.textContent = resultVal.split(' ')[0];
+            valDisplay.textContent = resultVal + unit;
+            instrDisplay.textContent = instructions;
+        }
+
+        function saveOfflineDraft(event) {
+            event.preventDefault();
+            
+            const animal = document.getElementById('draft-animal').value;
+            const identifier = document.getElementById('draft-identifier').value.trim();
+            const priority = document.getElementById('draft-priority').value;
+            const symptoms = document.getElementById('draft-symptoms').value.trim();
+            
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            const newDraft = {
+                id: 'draft-' + Date.now(),
+                animal,
+                identifier,
+                priority,
+                symptoms,
+                date: dateStr
+            };
+            
+            state.offlineDrafts.unshift(newDraft);
+            localStorage.setItem('pranicare_drafts', JSON.stringify(state.offlineDrafts));
+            
+            // Clear form
+            document.getElementById('offline-draft-form').reset();
+            
+            showToast('Symptom Log registered successfully inside local ledger.', 'success');
+            renderCurrentTab();
+        }
+
+        function deleteOfflineDraft(id) {
+            state.offlineDrafts = state.offlineDrafts.filter(d => d.id !== id);
+            localStorage.setItem('pranicare_drafts', JSON.stringify(state.offlineDrafts));
+            showToast('Draft record purged from device local ledger.', 'info');
+            renderCurrentTab();
+        }
+
+        function copyDraftToClipboard(id) {
+            const draft = state.offlineDrafts.find(d => d.id === id);
+            if (!draft) return;
+            
+            const textToCopy = `[PraniCare BD Offline Record]\nAnimal: ${draft.animal}\nIdentifier: ${draft.identifier}\nPriority: ${draft.priority}\nSymptoms: ${draft.symptoms}\nLogged: ${draft.date}`;
+            
+            // Clipboard Fallback compatible with iframe limits
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast('Draft log values cloned to clipboard storage.', 'success');
+            } catch (err) {
+                showToast('Failed to copy. Please manually capture log inputs.', 'error');
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        function triggerCloudSync() {
+            if (state.isSyncingDrafts) return;
+            state.isSyncingDrafts = true;
+            
+            const loader = document.getElementById('sync-loader');
+            const bar = document.getElementById('sync-loader-bar');
+            
+            loader.classList.remove('hidden');
+            bar.style.width = '0%';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    bar.style.width = '100%';
+                    
+                    setTimeout(() => {
+                        // Clear pending drafts upon mock upload success
+                        state.offlineDrafts = [];
+                        localStorage.removeItem('pranicare_drafts');
+                        
+                        loader.classList.add('hidden');
+                        state.isSyncingDrafts = false;
+                        showToast('All local logs safely synchronized with PraniCare BD Servers.', 'success');
+                        renderCurrentTab();
+                    }, 500);
+                } else {
+                    bar.style.width = progress + '%';
+                }
+            }, 250);
+        }
+
+        function addToCart(id, btn) {
+            state.cartCount++;
+            const badge = document.getElementById('cart-badge');
+            if (badge) {
+                badge.textContent = state.cartCount;
+                badge.classList.remove('hidden');
+                
+                const originalHtml = btn.innerHTML;
+                const origClasses = btn.className;
+                
+                btn.innerHTML = '<i class="fas fa-check text-xs"></i>';
+                btn.className = "bg-green-500 text-white w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shadow-sm transition-all scale-105";
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.className = origClasses;
+                }, 1000);
+            }
+        }
+
+        // --- Simulated Micro-Billing Flow ---
+        function promptPayment(amount, vetName) {
+            const cfg = data[state.mode];
+            const modal = document.getElementById('payment-modal');
+            
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl slide-up flex flex-col">
+                    <div class="${cfg.themePrimary} p-5 text-center text-white relative">
+                        <button onclick="closeModal('payment-modal')" class="absolute top-4 right-4 text-white/70 hover:text-white"><i class="fas fa-times"></i></button>
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2 backdrop-blur-sm">
+                            <i class="fas fa-file-invoice-dollar text-xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">MFS Escrow Checkout</h3>
+                        <p class="text-[10px] font-bold opacity-90 uppercase tracking-widest mt-1">Certified Tele-Vet consult fee</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+                            <span class="text-gray-500 text-sm font-semibold">Clinician Assigned</span>
+                            <span class="font-bold text-gray-900 text-sm">${vetName}</span>
+                        </div>
+                        <div class="text-center mb-6">
+                            <span class="text-4xl font-extrabold text-gray-900">৳${amount}</span>
+                        </div>
+                        
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3 text-center">Selected MFS Gateway</p>
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <button onclick="startVideoCall()" class="border-2 border-pink-100 rounded-xl p-3 flex flex-col items-center justify-center hover:border-pink-500 hover:bg-pink-50/50 transition-all focus:outline-none group">
+                                <div class="w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center font-black text-sm mb-2 group-hover:scale-105 transition-transform">bK</div>
+                                <span class="text-xs font-bold text-gray-700">bKash Pay</span>
+                            </button>
+                            <button onclick="startVideoCall()" class="border-2 border-orange-100 rounded-xl p-3 flex flex-col items-center justify-center hover:border-orange-500 hover:bg-orange-50/50 transition-all focus:outline-none group">
+                                <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-black text-sm mb-2 group-hover:scale-105 transition-transform">Ng</div>
+                                <span class="text-xs font-bold text-gray-700">Nagad Pay</span>
+                            </button>
+                        </div>
+                        
+                        <button onclick="closeModal('payment-modal')" class="w-full py-3 rounded-xl font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors focus:outline-none text-xs">Abort Transaction</button>
+                    </div>
+                </div>
+            `;
+            showModal('payment-modal');
+        }
+
+        // --- Simulated WebRTC Streams ---
+        function startVideoCall() {
+            closeModal('payment-modal');
+            const modal = document.getElementById('video-modal');
+            
+            modal.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center text-white p-6 relative w-full h-full max-w-md mx-auto sm:max-w-xl md:max-w-2xl lg:max-w-5xl bg-gray-900 shadow-2xl lg:rounded-2xl lg:h-[90vh] lg:my-[5vh]">
+                    
+                    <!-- Simulating Doctor Video Stream -->
+                    <div class="absolute inset-0 bg-gray-900 flex items-center justify-center overflow-hidden lg:rounded-2xl">
+                        <img src="https://placehold.co/600x800/1f2937/4b5563?text=Handshaking+WebRTC+Stream..." class="w-full h-full object-cover opacity-50" alt="Video">
+                    </div>
+                    
+                    <!-- Patient self PIP feed -->
+                    <div class="absolute top-6 right-6 w-24 h-36 sm:w-32 sm:h-48 bg-gray-800 rounded-xl overflow-hidden border-2 border-white/50 shadow-2xl z-20">
+                        <img src="https://placehold.co/150x200/374151/9ca3af?text=Self" class="w-full h-full object-cover" alt="Self">
+                    </div>
+                    
+                    <!-- WebRTC Connection Metrics Overlay -->
+                    <div class="absolute top-6 left-6 z-20 space-y-2">
+                        <div class="bg-black/50 px-3 py-1.5 rounded-full backdrop-blur-sm text-xs font-bold flex items-center border border-white/10 shadow-lg">
+                            <div class="w-2 h-2 rounded-full bg-red-500 mr-2 animate-pulse"></div> 
+                            <span class="font-mono">00:14</span>
+                        </div>
+                        <div class="bg-black/40 px-2.5 py-1 rounded-md text-[9px] text-green-400 font-mono flex items-center border border-green-500/30 backdrop-blur-sm shadow-lg">
+                            <i class="fas fa-signal mr-1.5"></i> WebRTC: Ultra Low latency codec
+                        </div>
+                    </div>
+
+                    <div class="z-20 mt-auto mb-8 w-full max-w-sm px-4">
+                        <div class="flex justify-center space-x-6 items-center bg-gray-900/80 p-4 rounded-3xl backdrop-blur-xl border border-gray-700 shadow-2xl">
+                            <button class="w-11 h-11 rounded-full bg-gray-700 text-white flex items-center justify-center hover:bg-gray-600 transition-colors focus:outline-none">
+                                <i class="fas fa-microphone-slash"></i>
+                            </button>
+                            <button onclick="endVideoCall()" class="w-14 h-14 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(220,38,38,0.4)] focus:outline-none border-2 border-red-500">
+                                <i class="fas fa-phone-slash text-xl"></i>
+                            </button>
+                            <button class="w-11 h-11 rounded-full bg-gray-700 text-white flex items-center justify-center hover:bg-gray-600 transition-colors focus:outline-none">
+                                <i class="fas fa-video"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            showModal('video-modal');
+        }
+
+        function endVideoCall() {
+            closeModal('video-modal');
+            
+            setTab('tracker');
+            showToast('Audio/Video session closed. Rendering digital Prescription...', 'success');
+            
+            setTimeout(() => {
+                const timeline = document.getElementById('tracker-timeline');
+                if(!timeline) return;
+
+                const pdfId = 'pdf-' + Math.floor(Math.random() * 9000 + 1000);
+                const isRural = state.mode === 'rural';
+                
+                const newRecord = document.createElement('div');
+                newRecord.className = "relative pl-6 slide-up";
+                newRecord.innerHTML = `
+                    <div class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-green-500 ring-4 ring-white shadow-sm z-10"></div>
+                    <div class="bg-gradient-to-br from-green-50 to-white p-4 rounded-xl border border-green-200 shadow-sm relative overflow-hidden">
+                        <i class="fas fa-file-prescription absolute -right-4 -top-4 text-6xl text-green-100/50 transform rotate-12"></i>
+                        <div class="relative z-10">
+                            <span class="text-[9px] font-extrabold text-green-700 bg-green-100 px-2 py-0.5 rounded-md mb-2 inline-block tracking-wider uppercase"><i class="fas fa-check-circle mr-1"></i> Digital Prescription Log</span>
+                            <h4 class="font-bold text-gray-900 text-xs sm:text-sm">Digital Rx Script Dispatched</h4>
+                            <p class="text-xs text-gray-600 mt-1 font-medium leading-relaxed">Assigned diagnosis: ${isRural ? 'Rumen pH destabilization / Mild protein shortage.' : 'Mild environmental pollen allergy.'}</p>
+                            
+                            <div class="mt-4 p-3 bg-white border border-gray-100 rounded-lg flex items-center justify-between">
+                                <div class="flex items-center text-xs font-bold text-gray-700">
+                                    <i class="fas fa-file-pdf text-red-500 mr-2 text-base"></i>
+                                    Rx_PraniCare_${pdfId}.pdf
+                                </div>
+                                <button id="btn-${pdfId}" onclick="simulatePDFDownload('${pdfId}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md text-[10px] font-bold transition-colors focus:outline-none flex items-center">
+                                    <i class="fas fa-download mr-1"></i> Save PDF
+                                </button>
+                            </div>
+                            
+                            <div id="progress-${pdfId}" class="mt-2.5 h-1.5 w-full bg-gray-200 rounded-full hidden overflow-hidden">
+                                <div id="bar-${pdfId}" class="h-full bg-red-500 w-0 transition-all duration-300"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                timeline.insertBefore(newRecord, timeline.firstChild);
+            }, 500);
+        }
+
+        function simulatePDFDownload(id) {
+            if (state.isGeneratingPDF) return;
+            state.isGeneratingPDF = true;
+            
+            const btn = document.getElementById(`btn-${id}`);
+            const progressContainer = document.getElementById(`progress-${id}`);
+            const bar = document.getElementById(`bar-${id}`);
+            
+            btn.innerHTML = '<div class="loader w-3 h-3 mr-1.5"></div> Compiling';
+            btn.classList.add('bg-gray-200', 'cursor-not-allowed');
+            progressContainer.classList.remove('hidden');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 25;
+                if(progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    bar.style.width = '100%';
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-check text-green-500 mr-1"></i> Saved to Device';
+                        btn.classList.remove('cursor-not-allowed');
+                        progressContainer.classList.add('opacity-0', 'transition-opacity');
+                        showToast('PDF compilation finalized. Saved offline.', 'success');
+                        state.isGeneratingPDF = false;
+                    }, 500);
+                } else {
+                    bar.style.width = progress + '%';
+                }
+            }, 250);
+        }
+
+        // Initialize application once document parses
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
